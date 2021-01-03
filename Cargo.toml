@@ -1,0 +1,29 @@
+[package]
+name = "howl"
+version = "0.1.0"
+authors = ["Akhil Vanka <akhilvanka1771@gmail.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A clone of Doggo.ninja's woof bash script, written in Rust"
+keywords = ["doggo.ninja", "file transfer", "ftp", "post", "file", "programming"]
+categories = ["command-line-utilities", "file transfer"]
+readme = "README.md"
+homepage = "https://github.com/akhilvanka/howl"
+repository = "https://github.com/akhilvanka/howl"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+read_input = "0.8.4"
+keyring = "0.10.1"
+ureq = "1.5.2"
+tree_magic = "0.2.3"
+serde_json = "1.0.61"
+serde = "1.0.118"
+clipboard = "0.5.0"
