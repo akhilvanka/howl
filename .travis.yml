@@ -8,6 +8,8 @@ jobs:
     - rust: nightly
   fast_finish: true
 before_script:
+- sudo apt install libdbus-1-dev
+- sudo apt install libxcb-shape0-dev libxcb-render0-dev libxcb-xfixes0-dev
 - rustup component add rustfmt
 script:
 - cargo build
