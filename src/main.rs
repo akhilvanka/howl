@@ -1,3 +1,15 @@
+//! This crate is a simple program to aid in the POSTing of a file to the doggo.ninja service. 
+//!
+//! This works with [Doggo.ninja](https://doggo.ninja) if the user has already successfully been given a key. 
+//! 
+//! # Example
+//! 
+//! Basic Usage:
+//! ```no_run
+//! howl path/to/file
+//! ``` 
+//! Thats it, the binary will do the rest, and even store the token in the OS keychain, provided there is one. Linux users may have to install seperate packages to access said features.
+
 //External Crates
 extern crate tree_magic;
 extern crate keyring;
@@ -22,8 +34,10 @@ struct Output {
     originalName: String,
 }
 
+/// The main function, responsible for the entire operation.
 //One Function
 fn main() -> std::io::Result<()> {
+  /// Uses the Keyring service/crate for easy storage of User's token.
   //Set up the keyring service for the token
   let service = "howl";
   let username = "Bearer";
@@ -39,17 +53,21 @@ fn main() -> std::io::Result<()> {
         keyring.set_password(&bearer).ok();
      }
   };
+  ///Takes argument, which should be a file, and derives the full path from it. 
   //Take the Arguments and make it a valid path
   let path = std::env::args().nth(1).expect("no path given");
   let srcdir = PathBuf::from(path.to_string());
   let n = fs::canonicalize(&srcdir).unwrap();
+  ///Opens the file, reads the metadata, filename, and the bytes for the POST operation.
   //Open the file, read the meta data and its file name
   let f = File::open(&n).expect("This Borked");
   let filename = n.file_name().unwrap();
   let metadata = f.metadata()?;
   let buffered_reader = BufReader::new(f);
+  ///Finds out the mimetpe of the file using Tree_Magic crate.
   //Read the mimetype of the fIle
   let result = tree_magic::from_filepath(&n);
+  ///POST using ureq crate.
   //POST using ureq
   let resp = ureq::post("https://pat.doggo.ninja/v1/upload")
       .set("Content-Type", "application/octet-stream")
@@ -58,6 +76,7 @@ fn main() -> std::io::Result<()> {
       .query("originalName", filename.to_str().unwrap())
       .query("mimeType", &result)
       .send(buffered_reader);
+  ///Check if the POST was successful, and handles JSON Parsing.
   //Final Check and Json Parsing
   if resp.ok() {
     let data = resp.into_string().unwrap();
